@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  ctf-machine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hackctf-boot2root
+
+    ports:
+      - "2222:22"
+      - "8080:80"
+      - "3306:3306"
+
+      # FTP
+      - "21:21"
+
+      # SSH secondary port
+      - "2121:2121"
+
+      # Internal services
+      - "8888:8888"
+      - "9000:9000"
+
+      # Passive FTP ports
+      - "21000-21100:21000-21100"
+
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=ctf_db
+      - MYSQL_USER=ctf_user
+      - MYSQL_PASSWORD=ctf_pass123
+
+    volumes:
+      - ./app:/var/www/html
+      - ctf-data:/var/lib/mysql
+
+    networks:
+      - ctf-network
+
+    restart: unless-stopped
+
+volumes:
+  ctf-data:
+
+networks:
+  ctf-network:
+    driver: bridge
